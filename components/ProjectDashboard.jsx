@@ -14,6 +14,7 @@ const ProjectDashboard = () => {
   const [newChecklistItem, setNewChecklistItem] = useState('');
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [updateTimers, setUpdateTimers] = useState({});
 
   const statusLabels = {
     'not-started': '未着手',
@@ -45,6 +46,15 @@ const ProjectDashboard = () => {
     setMounted(true);
     loadProjects();
   }, []);
+
+  // コンポーネントがアンマウントされる時にすべてのタイマーをクリア
+  useEffect(() => {
+    return () => {
+      Object.values(updateTimers).forEach(timer => {
+        if (timer) clearTimeout(timer);
+      });
+    };
+  }, [updateTimers]);
 
   const loadProjects = async () => {
     try {
@@ -194,30 +204,78 @@ const ProjectDashboard = () => {
   };
 
   const updateTaskStatus = async (projectId, taskId, newStatus) => {
-    try {
-      const { error } = await supabase
-        .from('tasks')
-        .update({ status: newStatus })
-        .eq('id', taskId);
-
-      if (error) throw error;
-      await loadProjects();
-    } catch (error) {
-      console.error('Error updating task status:', error);
-    }
+    // immediate=true で即座に保存
+    updateTaskDetails(projectId, taskId, 'status', newStatus, true);
   };
 
-  const updateTaskDetails = async (projectId, taskId, field, value) => {
-    try {
-      const { error } = await supabase
-        .from('tasks')
-        .update({ [field]: value })
-        .eq('id', taskId);
+  const updateTaskDetails = async (projectId, taskId, field, value, immediate = false) => {
+    // DB更新タイマーの管理
+    const timerKey = `${taskId}-${field}`;
+    
+    // 既存のタイマーをキャンセル
+    if (updateTimers[timerKey]) {
+      clearTimeout(updateTimers[timerKey]);
+      setUpdateTimers(prev => {
+        const newTimers = { ...prev };
+        delete newTimers[timerKey];
+        return newTimers;
+      });
+    }
 
-      if (error) throw error;
-      await loadProjects();
-    } catch (error) {
-      console.error('Error updating task:', error);
+    // まずUIを即座に更新（楽観的更新）
+    setProjects(prevProjects => 
+      prevProjects.map(project => {
+        if (project.id === projectId) {
+          return {
+            ...project,
+            tasks: project.tasks.map(task => 
+              task.id === taskId ? { ...task, [field]: value } : task
+            )
+          };
+        }
+        return project;
+      })
+    );
+
+    // 選択中のプロジェクトも更新
+    if (selectedProject && selectedProject.id === projectId) {
+      setSelectedProject(prev => ({
+        ...prev,
+        tasks: prev.tasks.map(task => 
+          task.id === taskId ? { ...task, [field]: value } : task
+        )
+      }));
+    }
+
+    // DB更新の実行
+    const saveToDatabase = async () => {
+      try {
+        const { error } = await supabase
+          .from('tasks')
+          .update({ [field]: value })
+          .eq('id', taskId);
+
+        if (error) throw error;
+        
+        // 保存成功後、タイマーを削除
+        setUpdateTimers(prev => {
+          const newTimers = { ...prev };
+          delete newTimers[timerKey];
+          return newTimers;
+        });
+      } catch (error) {
+        console.error('Error updating task:', error);
+        alert('保存に失敗しました。もう一度お試しください。');
+      }
+    };
+
+    if (immediate) {
+      // セレクトボックスなどは即座に保存
+      await saveToDatabase();
+    } else {
+      // テキスト入力は1.5秒後に保存（デバウンス）
+      const timer = setTimeout(saveToDatabase, 1500);
+      setUpdateTimers(prev => ({ ...prev, [timerKey]: timer }));
     }
   };
 
@@ -257,7 +315,8 @@ const ProjectDashboard = () => {
     if (!text.trim()) return;
 
     try {
-      const { error } = await supabase
+      // データベースに挿入
+      const { data, error } = await supabase
         .from('checklist_items')
         .insert([
           {
@@ -265,12 +324,51 @@ const ProjectDashboard = () => {
             text: text,
             completed: false
           }
-        ]);
+        ])
+        .select()
+        .single();
 
       if (error) throw error;
-      await loadProjects();
+
+      // UIを即座に更新（楽観的更新）
+      const newItem = data || {
+        id: Date.now().toString(), // 一時ID
+        task_id: taskId,
+        text: text,
+        completed: false
+      };
+
+      setProjects(prevProjects => 
+        prevProjects.map(project => {
+          if (project.id === projectId) {
+            return {
+              ...project,
+              tasks: project.tasks.map(task => 
+                task.id === taskId 
+                  ? { ...task, checklist: [...task.checklist, newItem] }
+                  : task
+              )
+            };
+          }
+          return project;
+        })
+      );
+
+      // 選択中のプロジェクトも更新
+      if (selectedProject && selectedProject.id === projectId) {
+        setSelectedProject(prev => ({
+          ...prev,
+          tasks: prev.tasks.map(task => 
+            task.id === taskId 
+              ? { ...task, checklist: [...task.checklist, newItem] }
+              : task
+          )
+        }));
+      }
+
     } catch (error) {
       console.error('Error adding checklist item:', error);
+      alert('チェックリスト項目の追加に失敗しました');
     }
   };
 
@@ -283,29 +381,115 @@ const ProjectDashboard = () => {
 
       if (!item) return;
 
+      const newCompletedState = !item.completed;
+
+      // UIを即座に更新
+      setProjects(prevProjects => 
+        prevProjects.map(project => {
+          if (project.id === projectId) {
+            return {
+              ...project,
+              tasks: project.tasks.map(t => {
+                if (t.id === taskId) {
+                  return {
+                    ...t,
+                    checklist: t.checklist.map(i => 
+                      i.id === checklistItemId 
+                        ? { ...i, completed: newCompletedState }
+                        : i
+                    )
+                  };
+                }
+                return t;
+              })
+            };
+          }
+          return project;
+        })
+      );
+
+      // 選択中のプロジェクトも更新
+      if (selectedProject && selectedProject.id === projectId) {
+        setSelectedProject(prev => ({
+          ...prev,
+          tasks: prev.tasks.map(t => {
+            if (t.id === taskId) {
+              return {
+                ...t,
+                checklist: t.checklist.map(i => 
+                  i.id === checklistItemId 
+                    ? { ...i, completed: newCompletedState }
+                    : i
+                )
+              };
+            }
+            return t;
+          })
+        }));
+      }
+
+      // データベースに保存
       const { error } = await supabase
         .from('checklist_items')
-        .update({ completed: !item.completed })
+        .update({ completed: newCompletedState })
         .eq('id', checklistItemId);
 
       if (error) throw error;
-      await loadProjects();
     } catch (error) {
       console.error('Error toggling checklist item:', error);
+      alert('チェックリスト項目の更新に失敗しました');
     }
   };
 
   const deleteChecklistItem = async (projectId, taskId, checklistItemId) => {
     try {
+      // UIを即座に更新
+      setProjects(prevProjects => 
+        prevProjects.map(project => {
+          if (project.id === projectId) {
+            return {
+              ...project,
+              tasks: project.tasks.map(t => {
+                if (t.id === taskId) {
+                  return {
+                    ...t,
+                    checklist: t.checklist.filter(i => i.id !== checklistItemId)
+                  };
+                }
+                return t;
+              })
+            };
+          }
+          return project;
+        })
+      );
+
+      // 選択中のプロジェクトも更新
+      if (selectedProject && selectedProject.id === projectId) {
+        setSelectedProject(prev => ({
+          ...prev,
+          tasks: prev.tasks.map(t => {
+            if (t.id === taskId) {
+              return {
+                ...t,
+                checklist: t.checklist.filter(i => i.id !== checklistItemId)
+              };
+            }
+            return t;
+          })
+        }));
+      }
+
+      // データベースから削除
       const { error } = await supabase
         .from('checklist_items')
         .delete()
         .eq('id', checklistItemId);
 
       if (error) throw error;
-      await loadProjects();
     } catch (error) {
       console.error('Error deleting checklist item:', error);
+      alert('チェックリスト項目の削除に失敗しました');
     }
   };
 
@@ -610,7 +794,14 @@ const ProjectDashboard = () => {
 
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                  <h4 className="font-semibold text-gray-800">{task.title}</h4>
+                                  <input
+                                    type="text"
+                                    value={task.title}
+                                    onChange={(e) => updateTaskDetails(selectedProject.id, task.id, 'title', e.target.value)}
+                                    onBlur={() => {}} 
+                                    className="font-semibold text-gray-800 bg-transparent border-0 focus:outline-none focus:ring-0 px-0 py-0"
+                                    style={{ width: `${Math.max(task.title.length * 8, 100)}px` }}
+                                  />
                                   <span className={`px-2 py-0.5 rounded text-xs ${priorityColors[task.priority]}`}>
                                     {priorityLabels[task.priority]}
                                   </span>
@@ -666,6 +857,47 @@ const ProjectDashboard = () => {
                             {/* 展開された詳細セクション */}
                             {isExpanded && (
                               <div className="bg-gray-50 border-t border-gray-300 p-4 space-y-4">
+                                {/* 担当者・優先度・期限日 */}
+                                <div className="grid grid-cols-3 gap-4">
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                      担当者（任意）
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={task.assignee || ''}
+                                      onChange={(e) => updateTaskDetails(selectedProject.id, task.id, 'assignee', e.target.value)}
+                                      className="w-full px-3 py-2 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                                      placeholder="担当者名..."
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                      優先度
+                                    </label>
+                                    <select
+                                      value={task.priority}
+                                      onChange={(e) => updateTaskDetails(selectedProject.id, task.id, 'priority', e.target.value, true)}
+                                      className="w-full px-3 py-2 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                                    >
+                                      <option value="low">低</option>
+                                      <option value="medium">中</option>
+                                      <option value="high">高</option>
+                                    </select>
+                                  </div>
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                      期限日
+                                    </label>
+                                    <input
+                                      type="date"
+                                      value={task.due_date || ''}
+                                      onChange={(e) => updateTaskDetails(selectedProject.id, task.id, 'due_date', e.target.value, true)}
+                                      className="w-full px-3 py-2 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                                    />
+                                  </div>
+                                </div>
+
                                 {/* 説明 */}
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700 mb-1">
