@@ -784,15 +784,9 @@ const TaskManagementBoard = () => {
                             className="bg-white rounded border border-gray-300 overflow-hidden"
                           >
                             {/* タスクヘッダー */}
-                            <div 
-                              className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50"
-                              onClick={() => setExpandedTask(isExpanded ? null : task.id)}
-                            >
+                            <div className="flex items-center gap-3 p-4">
                               <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setExpandedTask(isExpanded ? null : task.id);
-                                }}
+                                onClick={() => setExpandedTask(isExpanded ? null : task.id)}
                                 className="text-gray-500 hover:text-gray-700"
                               >
                                 {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
@@ -804,7 +798,6 @@ const TaskManagementBoard = () => {
                                     type="text"
                                     value={task.title}
                                     onChange={(e) => updateTaskDetails(selectedProject.id, task.id, 'title', e.target.value)}
-                                    onClick={(e) => e.stopPropagation()}
                                     onBlur={() => {}} 
                                     className="font-semibold text-gray-800 bg-transparent border-0 focus:outline-none focus:ring-0 px-0 py-0"
                                     style={{ width: `${Math.max(task.title.length * 8, 100)}px` }}
@@ -940,7 +933,7 @@ const TaskManagementBoard = () => {
                                   </label>
                                   <div className="space-y-2 mb-3">
                                     {task.checklist.map(item => (
-                                      <div key={item.id} className="flex items-center gap-2 bg-white rounded p-2 border border-gray-300">
+                                      <div key={item.id} className="flex items-center gap-2 group bg-white rounded p-2 border border-gray-300">
                                         <input
                                           type="checkbox"
                                           checked={item.completed}
@@ -951,15 +944,10 @@ const TaskManagementBoard = () => {
                                           {item.text}
                                         </span>
                                         <button
-                                          onClick={() => {
-                                            if (confirm('このチェックリスト項目を削除しますか？')) {
-                                              deleteChecklistItem(selectedProject.id, task.id, item.id);
-                                            }
-                                          }}
-                                          className="text-gray-400 hover:text-red-600"
-                                          title="削除"
+                                          onClick={() => deleteChecklistItem(selectedProject.id, task.id, item.id)}
+                                          className="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100"
                                         >
-                                          <X size={16} />
+                                          <X size={14} />
                                         </button>
                                       </div>
                                     ))}
