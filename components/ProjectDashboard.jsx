@@ -323,7 +323,7 @@ const ProjectDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <Loader className="w-10 h-10 text-blue-600 animate-spin mx-auto mb-3" />
           <p className="text-gray-600">読込中...</p>
@@ -333,7 +333,7 @@ const ProjectDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div>
       <style jsx global>{`
         body {
           font-family: 'メイリオ', 'Meiryo', sans-serif;
@@ -342,16 +342,8 @@ const ProjectDashboard = () => {
 
       `}</style>
 
-      <div className="max-w-7xl mx-auto p-6 md:p-8">
-        {/* ヘッダー */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">
-            Project Dashboard
-          </h1>
-        </div>
-
-        {/* 2カラムレイアウト */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* 2カラムレイアウト */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* 左側: プロジェクト一覧 */}
           <div className="lg:col-span-1">
             {/* プロジェクト追加ボタン */}
@@ -785,7 +777,6 @@ const ProjectDashboard = () => {
             )}
           </div>
         </div>
-      </div>
     </div>
   );
 };
