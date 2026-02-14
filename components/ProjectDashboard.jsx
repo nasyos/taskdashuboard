@@ -31,16 +31,16 @@ const ProjectDashboard = () => {
   };
 
   const statusColors = {
-    'not-started': 'bg-slate-100 text-slate-700 border border-slate-300',
-    'in-progress': 'bg-blue-50 text-blue-700 border border-blue-200',
-    'completed': 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-    'on-hold': 'bg-amber-50 text-amber-700 border border-amber-200'
+    'not-started': 'bg-slate-100 text-slate-700 border-2 border-slate-300',
+    'in-progress': 'bg-blue-100 text-blue-800 border-2 border-blue-300',
+    'completed': 'bg-emerald-100 text-emerald-800 border-2 border-emerald-300',
+    'on-hold': 'bg-amber-100 text-amber-800 border-2 border-amber-300'
   };
 
   const priorityColors = {
-    'high': 'bg-rose-50 text-rose-700 border border-rose-200',
-    'medium': 'bg-amber-50 text-amber-700 border border-amber-200',
-    'low': 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+    'high': 'bg-rose-100 text-rose-800 border-2 border-rose-300',
+    'medium': 'bg-amber-100 text-amber-800 border-2 border-amber-300',
+    'low': 'bg-emerald-100 text-emerald-800 border-2 border-emerald-300'
   };
 
   useEffect(() => {
@@ -290,26 +290,27 @@ const ProjectDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
-          <Loader className="w-12 h-12 text-cyan-400 animate-spin mx-auto mb-4" />
-          <p className="text-slate-400 font-light tracking-wide">読込中...</p>
+          <Loader className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-slate-600 font-medium tracking-wide">読込中...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
         
         body {
-          font-family: 'Outfit', sans-serif;
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 50%, #f1f5f9 100%);
         }
         
-        .font-mono-custom {
-          font-family: 'Space Mono', monospace;
+        .font-display {
+          font-family: 'Playfair Display', serif;
         }
 
         @keyframes fadeInUp {
@@ -334,12 +335,21 @@ const ProjectDashboard = () => {
           }
         }
 
-        @keyframes pulse-glow {
+        @keyframes shimmer {
+          0% {
+            background-position: -1000px 0;
+          }
+          100% {
+            background-position: 1000px 0;
+          }
+        }
+
+        @keyframes goldGlow {
           0%, 100% {
-            box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
           }
           50% {
-            box-shadow: 0 0 30px rgba(34, 211, 238, 0.5);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
           }
         }
 
@@ -351,51 +361,63 @@ const ProjectDashboard = () => {
           animation: slideInRight 0.5s ease-out;
         }
 
-        .gradient-border {
+        .luxury-card {
+          background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+          border: 2px solid transparent;
+          background-clip: padding-box;
           position: relative;
-          background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
-          border: 1px solid rgba(148, 163, 184, 0.1);
         }
 
-        .gradient-border::before {
+        .luxury-card::before {
           content: '';
           position: absolute;
-          inset: -1px;
+          inset: -2px;
           border-radius: inherit;
-          padding: 1px;
-          background: linear-gradient(135deg, rgba(34, 211, 238, 0.3), rgba(168, 85, 247, 0.3));
+          padding: 2px;
+          background: linear-gradient(135deg, #d4af37, #1e40af, #d4af37);
           -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
           -webkit-mask-composite: xor;
           mask-composite: exclude;
-          pointer-events: none;
+          opacity: 0.6;
         }
 
         .card-hover {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .card-hover:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 40px rgba(34, 211, 238, 0.1);
+          transform: translateY(-8px) scale(1.02);
+          box-shadow: 0 20px 60px rgba(30, 64, 175, 0.15), 0 0 40px rgba(212, 175, 55, 0.1);
         }
 
-        .glass-effect {
-          background: rgba(30, 41, 59, 0.6);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(148, 163, 184, 0.1);
+        .gold-shimmer {
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(212, 175, 55, 0.3),
+            transparent
+          );
+          background-size: 200% 100%;
+          animation: shimmer 3s infinite;
+        }
+
+        .elegant-border {
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          box-shadow: 0 4px 20px rgba(30, 64, 175, 0.08);
         }
       `}</style>
 
       <div className="max-w-7xl mx-auto p-6 md:p-8 lg:p-12">
         {/* ヘッダー */}
         <div className="mb-12 animate-fadeInUp">
-          <div className="flex items-end gap-4 mb-3">
-            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent font-mono-custom tracking-tight">
-              PROJECT
-            </h1>
-            <div className="h-2 w-2 bg-cyan-400 rounded-full mb-4 animate-pulse"></div>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="h-1 w-16 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full"></div>
+            <div className="h-3 w-3 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full shadow-lg" style={{ boxShadow: '0 0 20px rgba(212, 175, 55, 0.6)' }}></div>
           </div>
-          <p className="text-slate-400 text-lg font-light tracking-wide">複数プロジェクトの進捗を一元管理</p>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-900 bg-clip-text text-transparent font-display mb-3 tracking-tight">
+            Project Dashboard
+          </h1>
+          <p className="text-slate-600 text-lg font-light tracking-wide">複数プロジェクトを洗練されたインターフェースで一元管理</p>
         </div>
 
         {/* プロジェクト追加ボタン */}
@@ -403,36 +425,37 @@ const ProjectDashboard = () => {
           {!isAddingProject ? (
             <button
               onClick={() => setIsAddingProject(true)}
-              className="group flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 shadow-lg hover:shadow-cyan-500/50 font-medium"
+              className="relative group flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl hover:from-blue-700 hover:to-blue-900 transition-all duration-300 shadow-lg hover:shadow-xl font-medium border border-yellow-500/30 overflow-hidden"
             >
               <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
               新規プロジェクト追加
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-yellow-400/0 via-yellow-400/10 to-yellow-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 gold-shimmer"></div>
             </button>
           ) : (
-            <div className="glass-effect p-6 rounded-2xl border-2 border-cyan-500/30 shadow-xl">
+            <div className="luxury-card p-6 rounded-2xl shadow-xl elegant-border">
               <div className="flex gap-4 items-end">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-slate-300 mb-2 tracking-wide">プロジェクト名</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2 tracking-wide">プロジェクト名</label>
                   <input
                     type="text"
                     value={newProject.name}
                     onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-slate-100 placeholder-slate-500 transition-all"
+                    className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-800 placeholder-slate-400 transition-all"
                     placeholder="プロジェクト名を入力"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2 tracking-wide">カラー</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2 tracking-wide">カラー</label>
                   <input
                     type="color"
                     value={newProject.color}
                     onChange={(e) => setNewProject({ ...newProject, color: e.target.value })}
-                    className="h-12 w-24 border border-slate-600 rounded-xl cursor-pointer bg-slate-800"
+                    className="h-12 w-24 border-2 border-slate-200 rounded-xl cursor-pointer bg-white"
                   />
                 </div>
                 <button
                   onClick={addProject}
-                  className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl hover:from-emerald-400 hover:to-teal-500 flex items-center gap-2 transition-all duration-300 font-medium shadow-lg"
+                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl hover:from-blue-700 hover:to-blue-900 flex items-center gap-2 transition-all duration-300 font-medium shadow-lg border border-yellow-500/20"
                 >
                   <Check size={18} />
                   追加
@@ -442,7 +465,7 @@ const ProjectDashboard = () => {
                     setIsAddingProject(false);
                     setNewProject({ name: '', color: '#3b82f6' });
                   }}
-                  className="px-6 py-3 bg-slate-700 text-slate-200 rounded-xl hover:bg-slate-600 flex items-center gap-2 transition-all duration-300 font-medium"
+                  className="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 flex items-center gap-2 transition-all duration-300 font-medium border border-slate-300"
                 >
                   <X size={18} />
                   キャンセル
@@ -464,20 +487,22 @@ const ProjectDashboard = () => {
             return (
               <div
                 key={project.id}
-                className="gradient-border rounded-2xl p-6 cursor-pointer card-hover animate-fadeInUp"
+                className="luxury-card rounded-2xl p-6 cursor-pointer card-hover animate-fadeInUp relative overflow-hidden"
                 style={{ animationDelay: `${index * 0.1}s` }}
                 onClick={() => setSelectedProject(project)}
               >
-                <div className="flex items-start justify-between mb-5">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-yellow-400/10 to-transparent rounded-bl-full"></div>
+                
+                <div className="flex items-start justify-between mb-5 relative z-10">
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-5 h-5 rounded-full shadow-lg"
+                      className="w-5 h-5 rounded-full shadow-lg border-2 border-white"
                       style={{ 
                         backgroundColor: project.color,
-                        boxShadow: `0 0 20px ${project.color}50`
+                        boxShadow: `0 4px 15px ${project.color}60`
                       }}
                     />
-                    <h3 className="text-lg font-semibold text-slate-100 tracking-wide">{project.name}</h3>
+                    <h3 className="text-lg font-semibold text-slate-800 tracking-wide font-display">{project.name}</h3>
                   </div>
                   <button
                     onClick={(e) => {
@@ -486,50 +511,51 @@ const ProjectDashboard = () => {
                         deleteProject(project.id);
                       }
                     }}
-                    className="text-slate-500 hover:text-rose-400 transition-colors"
+                    className="text-slate-400 hover:text-red-600 transition-colors"
                   >
                     <Trash2 size={16} />
                   </button>
                 </div>
 
-                <div className="mb-5">
-                  <div className="flex justify-between text-sm text-slate-400 mb-2 font-light">
+                <div className="mb-5 relative z-10">
+                  <div className="flex justify-between text-sm text-slate-600 mb-2 font-medium">
                     <span>進捗率</span>
-                    <span className="font-semibold text-cyan-400 font-mono-custom">{progress}%</span>
+                    <span className="font-bold text-blue-700">{progress}%</span>
                   </div>
-                  <div className="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                  <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden shadow-inner">
                     <div
-                      className="h-2.5 rounded-full transition-all duration-500 shadow-lg"
+                      className="h-3 rounded-full transition-all duration-500 relative"
                       style={{
                         width: `${progress}%`,
                         background: `linear-gradient(90deg, ${project.color}, ${project.color}dd)`,
-                        boxShadow: `0 0 10px ${project.color}80`
                       }}
-                    />
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 text-sm mb-5">
-                  <div className="flex items-center justify-between bg-slate-800/40 rounded-lg px-3 py-2">
-                    <span className="text-slate-400 font-light">未着手</span>
-                    <span className="font-semibold text-slate-300 font-mono-custom">{notStarted}</span>
+                <div className="grid grid-cols-2 gap-3 text-sm mb-5 relative z-10">
+                  <div className="flex items-center justify-between bg-slate-50 rounded-lg px-3 py-2.5 border border-slate-200">
+                    <span className="text-slate-600 font-medium">未着手</span>
+                    <span className="font-bold text-slate-700">{notStarted}</span>
                   </div>
-                  <div className="flex items-center justify-between bg-blue-900/20 rounded-lg px-3 py-2 border border-blue-500/20">
-                    <span className="text-blue-400 font-light">進行中</span>
-                    <span className="font-semibold text-blue-300 font-mono-custom">{inProgress}</span>
+                  <div className="flex items-center justify-between bg-blue-50 rounded-lg px-3 py-2.5 border border-blue-200">
+                    <span className="text-blue-700 font-medium">進行中</span>
+                    <span className="font-bold text-blue-800">{inProgress}</span>
                   </div>
-                  <div className="flex items-center justify-between bg-emerald-900/20 rounded-lg px-3 py-2 border border-emerald-500/20">
-                    <span className="text-emerald-400 font-light">完了</span>
-                    <span className="font-semibold text-emerald-300 font-mono-custom">{completed}</span>
+                  <div className="flex items-center justify-between bg-emerald-50 rounded-lg px-3 py-2.5 border border-emerald-200">
+                    <span className="text-emerald-700 font-medium">完了</span>
+                    <span className="font-bold text-emerald-800">{completed}</span>
                   </div>
-                  <div className="flex items-center justify-between bg-amber-900/20 rounded-lg px-3 py-2 border border-amber-500/20">
-                    <span className="text-amber-400 font-light">保留</span>
-                    <span className="font-semibold text-amber-300 font-mono-custom">{onHold}</span>
+                  <div className="flex items-center justify-between bg-amber-50 rounded-lg px-3 py-2.5 border border-amber-200">
+                    <span className="text-amber-700 font-medium">保留</span>
+                    <span className="font-bold text-amber-800">{onHold}</span>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-slate-700/50 text-sm text-slate-500 font-light">
-                  合計 <span className="font-semibold text-slate-400 font-mono-custom">{project.tasks.length}</span> タスク
+                <div className="pt-4 border-t border-yellow-500/20 text-sm text-slate-600 font-medium relative z-10">
+                  合計 <span className="font-bold text-slate-800">{project.tasks.length}</span> タスク
                 </div>
               </div>
             );
@@ -538,21 +564,21 @@ const ProjectDashboard = () => {
 
         {/* プロジェクト詳細 */}
         {selectedProject && (
-          <div className="glass-effect rounded-2xl p-8 shadow-2xl border border-slate-700/50 animate-fadeInUp">
+          <div className="luxury-card rounded-2xl p-8 shadow-2xl elegant-border animate-fadeInUp">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
                 <div
-                  className="w-7 h-7 rounded-full shadow-lg"
+                  className="w-8 h-8 rounded-full shadow-lg border-2 border-white"
                   style={{ 
                     backgroundColor: selectedProject.color,
-                    boxShadow: `0 0 25px ${selectedProject.color}60`
+                    boxShadow: `0 4px 20px ${selectedProject.color}60`
                   }}
                 />
-                <h2 className="text-3xl font-bold text-slate-100 tracking-wide">{selectedProject.name}</h2>
+                <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-blue-700 bg-clip-text text-transparent font-display">{selectedProject.name}</h2>
               </div>
               <button
                 onClick={() => setSelectedProject(null)}
-                className="text-slate-500 hover:text-slate-300 transition-colors p-2"
+                className="text-slate-400 hover:text-slate-700 transition-colors p-2 rounded-lg hover:bg-slate-100"
               >
                 <X size={28} />
               </button>
@@ -562,10 +588,10 @@ const ProjectDashboard = () => {
             <div className="flex flex-wrap gap-3 mb-8">
               <button
                 onClick={() => setFilterStatus('all')}
-                className={`px-5 py-2.5 rounded-xl transition-all duration-300 font-medium ${
+                className={`px-6 py-2.5 rounded-xl transition-all duration-300 font-semibold ${
                   filterStatus === 'all'
-                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30'
-                    : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/50 border border-slate-700'
+                    ? 'bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg border border-yellow-500/30'
+                    : 'bg-white text-slate-700 hover:bg-slate-50 border-2 border-slate-200'
                 }`}
               >
                 すべて
@@ -574,10 +600,10 @@ const ProjectDashboard = () => {
                 <button
                   key={status}
                   onClick={() => setFilterStatus(status)}
-                  className={`px-5 py-2.5 rounded-xl transition-all duration-300 font-medium ${
+                  className={`px-6 py-2.5 rounded-xl transition-all duration-300 font-semibold ${
                     filterStatus === status
-                      ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30'
-                      : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/50 border border-slate-700'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg border border-yellow-500/30'
+                      : 'bg-white text-slate-700 hover:bg-slate-50 border-2 border-slate-200'
                   }`}
                 >
                   {label}
@@ -589,25 +615,25 @@ const ProjectDashboard = () => {
             {!isAddingTask ? (
               <button
                 onClick={() => setIsAddingTask(true)}
-                className="flex items-center gap-2 px-5 py-3 mb-6 text-cyan-400 hover:bg-cyan-500/10 rounded-xl transition-all duration-300 border border-cyan-500/30 hover:border-cyan-500/50 font-medium"
+                className="flex items-center gap-2 px-6 py-3 mb-6 text-blue-700 hover:bg-blue-50 rounded-xl transition-all duration-300 border-2 border-blue-200 hover:border-blue-400 font-semibold"
               >
                 <Plus size={20} />
                 タスクを追加
               </button>
             ) : (
-              <div className="mb-6 p-6 bg-cyan-950/30 rounded-2xl border-2 border-cyan-500/30 shadow-xl">
+              <div className="mb-6 p-6 bg-gradient-to-br from-blue-50 to-slate-50 rounded-2xl border-2 border-blue-300 shadow-lg">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                   <input
                     type="text"
                     value={newTask.title}
                     onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                    className="md:col-span-2 px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-slate-100 placeholder-slate-500"
+                    className="md:col-span-2 px-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-800 placeholder-slate-400"
                     placeholder="タスク名"
                   />
                   <select
                     value={newTask.priority}
                     onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
-                    className="px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-slate-100"
+                    className="px-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-800 font-medium"
                   >
                     <option value="high">優先度: 高</option>
                     <option value="medium">優先度: 中</option>
@@ -617,13 +643,13 @@ const ProjectDashboard = () => {
                     type="date"
                     value={newTask.dueDate}
                     onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-                    className="px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-slate-100"
+                    className="px-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-800"
                   />
                 </div>
                 <div className="flex gap-3">
                   <button
                     onClick={() => addTask(selectedProject.id)}
-                    className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl hover:from-emerald-400 hover:to-teal-500 flex items-center gap-2 transition-all duration-300 font-medium shadow-lg"
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl hover:from-blue-700 hover:to-blue-900 flex items-center gap-2 transition-all duration-300 font-semibold shadow-lg border border-yellow-500/20"
                   >
                     <Check size={18} />
                     追加
@@ -633,7 +659,7 @@ const ProjectDashboard = () => {
                       setIsAddingTask(false);
                       setNewTask({ title: '', priority: 'medium', dueDate: '' });
                     }}
-                    className="px-6 py-3 bg-slate-700 text-slate-200 rounded-xl hover:bg-slate-600 flex items-center gap-2 transition-all duration-300 font-medium"
+                    className="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 flex items-center gap-2 transition-all duration-300 font-semibold border border-slate-300"
                   >
                     <X size={18} />
                     キャンセル
@@ -653,43 +679,43 @@ const ProjectDashboard = () => {
                   return (
                     <div
                       key={task.id}
-                      className="bg-slate-800/40 rounded-xl overflow-hidden border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300"
+                      className="bg-white rounded-xl overflow-hidden border-2 border-slate-200 hover:border-blue-300 transition-all duration-300 shadow-md hover:shadow-lg"
                     >
                       {/* タスクヘッダー */}
-                      <div className="flex items-center gap-4 p-5">
+                      <div className="flex items-center gap-4 p-5 bg-gradient-to-r from-white to-slate-50">
                         <button
                           onClick={() => setExpandedTask(isExpanded ? null : task.id)}
-                          className="text-slate-400 hover:text-cyan-400 transition-colors"
+                          className="text-slate-500 hover:text-blue-600 transition-colors"
                         >
                           {isExpanded ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
                         </button>
 
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2 flex-wrap">
-                            <h4 className="font-semibold text-slate-100 text-lg">{task.title}</h4>
-                            <span className={`px-3 py-1 rounded-lg text-xs font-medium ${priorityColors[task.priority]}`}>
+                            <h4 className="font-semibold text-slate-800 text-lg">{task.title}</h4>
+                            <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${priorityColors[task.priority]}`}>
                               {priorityLabels[task.priority]}
                             </span>
-                            <span className={`px-3 py-1 rounded-lg text-xs font-medium ${statusColors[task.status]}`}>
+                            <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${statusColors[task.status]}`}>
                               {statusLabels[task.status]}
                             </span>
                           </div>
                           {task.due_date && (
                             <div className={`flex items-center gap-2 text-sm ${
                               isOverdue(task.due_date) && task.status !== 'completed'
-                                ? 'text-rose-400'
-                                : 'text-slate-400'
+                                ? 'text-red-600 font-semibold'
+                                : 'text-slate-600'
                             }`}>
                               <Calendar size={14} />
-                              <span className="font-light">期限: {task.due_date}</span>
+                              <span>期限: {task.due_date}</span>
                               {isOverdue(task.due_date) && task.status !== 'completed' && (
                                 <AlertCircle size={14} className="ml-1" />
                               )}
                             </div>
                           )}
                           {task.checklist.length > 0 && (
-                            <div className="text-sm text-slate-400 mt-2 font-light">
-                              チェックリスト: <span className="font-semibold text-cyan-400 font-mono-custom">{task.checklist.filter(item => item.completed).length}/{task.checklist.length}</span> 完了
+                            <div className="text-sm text-slate-600 mt-2 font-medium">
+                              チェックリスト: <span className="font-bold text-blue-700">{task.checklist.filter(item => item.completed).length}/{task.checklist.length}</span> 完了
                             </div>
                           )}
                         </div>
@@ -698,7 +724,7 @@ const ProjectDashboard = () => {
                           <select
                             value={task.status}
                             onChange={(e) => updateTaskStatus(selectedProject.id, task.id, e.target.value)}
-                            className="px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-xl text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-slate-100 font-medium"
+                            className="px-4 py-2 bg-white border-2 border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-800 font-semibold"
                             onClick={(e) => e.stopPropagation()}
                           >
                             {Object.entries(statusLabels).map(([status, label]) => (
@@ -712,7 +738,7 @@ const ProjectDashboard = () => {
                                 deleteTask(selectedProject.id, task.id);
                               }
                             }}
-                            className="text-slate-500 hover:text-rose-400 transition-colors p-2"
+                            className="text-slate-400 hover:text-red-600 transition-colors p-2 rounded-lg hover:bg-red-50"
                           >
                             <Trash2 size={18} />
                           </button>
@@ -721,16 +747,17 @@ const ProjectDashboard = () => {
 
                       {/* 展開された詳細セクション */}
                       {isExpanded && (
-                        <div className="bg-slate-900/60 border-t border-slate-700/50 p-6 space-y-6">
+                        <div className="bg-gradient-to-br from-slate-50 to-blue-50 border-t-2 border-blue-200 p-6 space-y-6">
                           {/* 説明 */}
                           <div>
-                            <label className="block text-sm font-semibold text-slate-300 mb-3 tracking-wide">
+                            <label className="block text-sm font-bold text-slate-700 mb-3 tracking-wide flex items-center gap-2">
+                              <div className="w-1 h-4 bg-gradient-to-b from-blue-600 to-blue-800 rounded-full"></div>
                               タスクの説明
                             </label>
                             <textarea
                               value={task.description || ''}
                               onChange={(e) => updateTaskDetails(selectedProject.id, task.id, 'description', e.target.value)}
-                              className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none text-slate-100 placeholder-slate-500 font-light"
+                              className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-slate-800 placeholder-slate-400"
                               rows="3"
                               placeholder="タスクの詳細な説明を記入..."
                             />
@@ -738,13 +765,14 @@ const ProjectDashboard = () => {
 
                           {/* 要件定義 */}
                           <div>
-                            <label className="block text-sm font-semibold text-slate-300 mb-3 tracking-wide">
+                            <label className="block text-sm font-bold text-slate-700 mb-3 tracking-wide flex items-center gap-2">
+                              <div className="w-1 h-4 bg-gradient-to-b from-blue-600 to-blue-800 rounded-full"></div>
                               要件定義・仕様
                             </label>
                             <textarea
                               value={task.requirements || ''}
                               onChange={(e) => updateTaskDetails(selectedProject.id, task.id, 'requirements', e.target.value)}
-                              className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent font-mono-custom text-sm resize-none text-slate-100 placeholder-slate-500"
+                              className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm resize-none text-slate-800 placeholder-slate-400"
                               rows="6"
                               placeholder="要件や仕様を記載...&#10;例:&#10;- 機能要件1&#10;- 機能要件2&#10;- 非機能要件"
                             />
@@ -752,24 +780,25 @@ const ProjectDashboard = () => {
 
                           {/* チェックリスト */}
                           <div>
-                            <label className="block text-sm font-semibold text-slate-300 mb-3 tracking-wide">
+                            <label className="block text-sm font-bold text-slate-700 mb-3 tracking-wide flex items-center gap-2">
+                              <div className="w-1 h-4 bg-gradient-to-b from-blue-600 to-blue-800 rounded-full"></div>
                               チェックリスト
                             </label>
                             <div className="space-y-3 mb-4">
                               {task.checklist.map(item => (
-                                <div key={item.id} className="flex items-center gap-3 group bg-slate-800/30 rounded-lg p-3 hover:bg-slate-800/50 transition-colors">
+                                <div key={item.id} className="flex items-center gap-3 group bg-white rounded-lg p-3 border-2 border-slate-200 hover:border-blue-300 transition-all">
                                   <input
                                     type="checkbox"
                                     checked={item.completed}
                                     onChange={() => toggleChecklistItem(selectedProject.id, task.id, item.id)}
-                                    className="w-5 h-5 text-cyan-500 rounded focus:ring-2 focus:ring-cyan-500 bg-slate-700 border-slate-600"
+                                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 border-slate-300"
                                   />
-                                  <span className={`flex-1 ${item.completed ? 'line-through text-slate-500' : 'text-slate-200'} font-light`}>
+                                  <span className={`flex-1 ${item.completed ? 'line-through text-slate-400' : 'text-slate-800 font-medium'}`}>
                                     {item.text}
                                   </span>
                                   <button
                                     onClick={() => deleteChecklistItem(selectedProject.id, task.id, item.id)}
-                                    className="text-slate-600 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-all"
+                                    className="text-slate-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all"
                                   >
                                     <X size={16} />
                                   </button>
@@ -787,7 +816,7 @@ const ProjectDashboard = () => {
                                     setNewChecklistItem('');
                                   }
                                 }}
-                                className="flex-1 px-4 py-2 bg-slate-800/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm text-slate-100 placeholder-slate-500"
+                                className="flex-1 px-4 py-2 bg-white border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-slate-800 placeholder-slate-400"
                                 placeholder="新しいチェック項目を追加..."
                               />
                               <button
@@ -795,7 +824,7 @@ const ProjectDashboard = () => {
                                   addChecklistItem(selectedProject.id, task.id, newChecklistItem);
                                   setNewChecklistItem('');
                                 }}
-                                className="px-5 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl hover:from-cyan-400 hover:to-blue-500 text-sm font-medium transition-all duration-300"
+                                className="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl hover:from-blue-700 hover:to-blue-900 text-sm font-semibold transition-all duration-300 border border-yellow-500/20"
                               >
                                 追加
                               </button>
@@ -804,13 +833,14 @@ const ProjectDashboard = () => {
 
                           {/* メモ・備考 */}
                           <div>
-                            <label className="block text-sm font-semibold text-slate-300 mb-3 tracking-wide">
+                            <label className="block text-sm font-bold text-slate-700 mb-3 tracking-wide flex items-center gap-2">
+                              <div className="w-1 h-4 bg-gradient-to-b from-blue-600 to-blue-800 rounded-full"></div>
                               メモ・備考
                             </label>
                             <textarea
                               value={task.notes || ''}
                               onChange={(e) => updateTaskDetails(selectedProject.id, task.id, 'notes', e.target.value)}
-                              className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none text-slate-100 placeholder-slate-500 font-light"
+                              className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-slate-800 placeholder-slate-400"
                               rows="3"
                               placeholder="メモや備考を記入..."
                             />
