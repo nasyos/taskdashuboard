@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Check, X, Calendar, AlertCircle, ChevronDown, ChevronUp, Loader } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
@@ -51,28 +49,43 @@ const ProjectDashboard = () => {
   const loadProjects = async () => {
     try {
       setLoading(true);
+      console.log('Loading projects...');
       const { data: projectsData, error } = await supabase
         .from('projects')
         .select('*')
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading projects:', error);
+        alert(`プロジェクトの読み込みエラー: ${error.message}`);
+        throw error;
+      }
+
+      console.log('Projects loaded:', projectsData);
 
       const projectsWithTasks = await Promise.all(
         (projectsData || []).map(async (project) => {
-          const { data: tasksData } = await supabase
+          const { data: tasksData, error: tasksError } = await supabase
             .from('tasks')
             .select('*')
             .eq('project_id', project.id)
             .order('created_at', { ascending: true });
 
+          if (tasksError) {
+            console.error('Error loading tasks:', tasksError);
+          }
+
           const tasksWithChecklists = await Promise.all(
             (tasksData || []).map(async (task) => {
-              const { data: checklistData } = await supabase
+              const { data: checklistData, error: checklistError } = await supabase
                 .from('checklist_items')
                 .select('*')
                 .eq('task_id', task.id)
                 .order('created_at', { ascending: true });
+
+              if (checklistError) {
+                console.error('Error loading checklist:', checklistError);
+              }
 
               return {
                 ...task,
@@ -88,6 +101,7 @@ const ProjectDashboard = () => {
         })
       );
 
+      console.log('Projects with tasks:', projectsWithTasks);
       setProjects(projectsWithTasks);
     } catch (error) {
       console.error('Error loading projects:', error);
@@ -107,9 +121,13 @@ const ProjectDashboard = () => {
   };
 
   const addTask = async (projectId) => {
-    if (!newTask.title.trim()) return;
+    if (!newTask.title.trim()) {
+      alert('タスク名を入力してください');
+      return;
+    }
 
     try {
+      console.log('Adding task:', { projectId, newTask });
       const { data, error } = await supabase
         .from('tasks')
         .insert([
@@ -127,8 +145,13 @@ const ProjectDashboard = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        alert(`エラーが発生しました: ${error.message}`);
+        throw error;
+      }
 
+      console.log('Task added successfully:', data);
       await loadProjects();
       setNewTask({ title: '', priority: 'medium', dueDate: '' });
       setIsAddingTask(false);
@@ -138,20 +161,30 @@ const ProjectDashboard = () => {
   };
 
   const addProject = async () => {
-    if (!newProject.name.trim()) return;
+    if (!newProject.name.trim()) {
+      alert('プロジェクト名を入力してください');
+      return;
+    }
 
     try {
-      const { error } = await supabase
+      console.log('Adding project:', newProject);
+      const { data, error } = await supabase
         .from('projects')
         .insert([
           {
             name: newProject.name,
             color: newProject.color
           }
-        ]);
+        ])
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        alert(`エラーが発生しました: ${error.message}`);
+        throw error;
+      }
 
+      console.log('Project added successfully:', data);
       await loadProjects();
       setNewProject({ name: '', color: '#3b82f6' });
       setIsAddingProject(false);
@@ -379,6 +412,7 @@ const ProjectDashboard = () => {
           -webkit-mask-composite: xor;
           mask-composite: exclude;
           opacity: 0.6;
+          pointer-events: none;
         }
 
         .card-hover {
@@ -433,7 +467,7 @@ const ProjectDashboard = () => {
             </button>
           ) : (
             <div className="luxury-card p-6 rounded-2xl shadow-xl elegant-border">
-              <div className="flex gap-4 items-end">
+              <div className="flex gap-4 items-end relative z-10">
                 <div className="flex-1">
                   <label className="block text-sm font-semibold text-slate-700 mb-2 tracking-wide">プロジェクト名</label>
                   <input
@@ -810,7 +844,7 @@ const ProjectDashboard = () => {
                                 type="text"
                                 value={newChecklistItem}
                                 onChange={(e) => setNewChecklistItem(e.target.value)}
-                                onKeyPress={(e) => {
+                                onKeyDown={(e) => {
                                   if (e.key === 'Enter') {
                                     addChecklistItem(selectedProject.id, task.id, newChecklistItem);
                                     setNewChecklistItem('');
