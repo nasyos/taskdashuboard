@@ -8,6 +8,7 @@ const DailyTodo = () => {
   const [newTodoTitle, setNewTodoTitle] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [tableError, setTableError] = useState(false);
 
   useEffect(() => {
     loadTodos();
@@ -58,14 +59,25 @@ const DailyTodo = () => {
 
       if (error) {
         console.error('Supabase error:', error);
-        alert(`ToDoの読み込みエラー: ${error.message}`);
-        throw error;
+        // テーブルが存在しない場合のエラーメッセージ
+        if (error.message.includes('relation "public.daily_todos" does not exist')) {
+          console.error('daily_todosテーブルが存在しません。Supabaseで作成してください。');
+          setTableError(true);
+          setTodos([]);
+        } else {
+          setTableError(false);
+          alert(`ToDoの読み込みエラー: ${error.message}`);
+        }
+        return;
       }
+
+      setTableError(false);
 
       console.log('Todos loaded:', data);
       setTodos(data || []);
     } catch (error) {
       console.error('Error loading todos:', error);
+      setTodos([]);
     } finally {
       setLoading(false);
     }
@@ -95,8 +107,13 @@ const DailyTodo = () => {
 
       if (error) {
         console.error('Supabase error:', error);
-        alert(`ToDoの追加エラー: ${error.message}`);
-        throw error;
+        // テーブルが存在しない場合のエラーメッセージ
+        if (error.message.includes('relation "public.daily_todos" does not exist')) {
+          alert('エラー: daily_todosテーブルが存在しません。\n\nSupabaseでテーブルを作成してください。\n手順はREADME.mdを参照してください。');
+        } else {
+          alert(`ToDoの追加エラー: ${error.message}`);
+        }
+        return;
       }
 
       console.log('Todo added:', data);
@@ -262,7 +279,23 @@ const DailyTodo = () => {
 
       {/* ToDoリスト */}
       <div className="space-y-2">
-        {loading ? (
+        {tableError ? (
+          <div className="bg-yellow-50 border border-yellow-300 rounded p-4 text-sm">
+            <p className="font-semibold text-yellow-800 mb-2">⚠️ テーブルが作成されていません</p>
+            <p className="text-yellow-700 mb-3">
+              Supabaseで<code className="bg-yellow-100 px-1 rounded">daily_todos</code>テーブルを作成してください。
+            </p>
+            <details className="text-yellow-700">
+              <summary className="cursor-pointer font-semibold mb-2">作成手順を表示</summary>
+              <ol className="list-decimal list-inside space-y-1 ml-2">
+                <li>Supabaseダッシュボードにログイン</li>
+                <li>「SQL Editor」→「New query」をクリック</li>
+                <li><code className="bg-yellow-100 px-1 rounded">supabase-daily-todos-schema.sql</code>の内容をペースト</li>
+                <li>「Run」ボタンをクリック</li>
+              </ol>
+            </details>
+          </div>
+        ) : loading ? (
           <p className="text-gray-500 text-center py-4">読込中...</p>
         ) : todos.length === 0 ? (
           <p className="text-gray-400 text-center py-8">ToDoがありません</p>
