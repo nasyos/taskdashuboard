@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Check, X, Calendar, AlertCircle, ChevronDown, ChevronUp, Loader } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
-const ProjectDashboard = () => {
+const TaskManagementBoard = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
@@ -1013,4 +1013,4 @@ const ProjectDashboard = () => {
   );
 };
 
-export default ProjectDashboard;
+export default TaskManagementBoard;
