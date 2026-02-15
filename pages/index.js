@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import TaskManagementBoard from '../components/TaskManagementBoard'
+import GoalSection from '../components/GoalSection'
 import DailyTodo from '../components/DailyTodo'
 
 export default function Home() {
@@ -18,6 +19,11 @@ export default function Home() {
             TaskManagementBoard
           </h1>
           
+          {/* 目標 */}
+          <div className="mb-8">
+            <GoalSection />
+          </div>
+
           {/* 本日のToDo */}
           <div className="mb-8">
             <DailyTodo />
