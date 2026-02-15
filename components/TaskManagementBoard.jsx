@@ -8,7 +8,7 @@ const TaskManagementBoard = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [isAddingProject, setIsAddingProject] = useState(false);
-  const [newTask, setNewTask] = useState({ title: '', priority: 'medium', dueDate: '' });
+  const [newTask, setNewTask] = useState({ title: '', priority: 'medium', dueDate: '', category: 'その他' });
   const [newProject, setNewProject] = useState({ name: '', color: '#3b82f6' });
   const [expandedTask, setExpandedTask] = useState(null);
   const [newChecklistItem, setNewChecklistItem] = useState('');
@@ -40,6 +40,20 @@ const TaskManagementBoard = () => {
     'high': 'bg-rose-100 text-rose-800 border-2 border-rose-300',
     'medium': 'bg-amber-100 text-amber-800 border-2 border-amber-300',
     'low': 'bg-emerald-100 text-emerald-800 border-2 border-emerald-300'
+  };
+
+  const categoryLabels = {
+    '開発': '開発',
+    '営業': '営業',
+    'マーケティング': 'マーケティング',
+    'その他': 'その他'
+  };
+
+  const categoryColors = {
+    '開発': 'bg-purple-100 text-purple-800 border-2 border-purple-300',
+    '営業': 'bg-green-100 text-green-800 border-2 border-green-300',
+    'マーケティング': 'bg-pink-100 text-pink-800 border-2 border-pink-300',
+    'その他': 'bg-gray-100 text-gray-800 border-2 border-gray-300'
   };
 
   useEffect(() => {
@@ -146,6 +160,7 @@ const TaskManagementBoard = () => {
             title: newTask.title,
             priority: newTask.priority,
             due_date: newTask.dueDate || null,
+            category: newTask.category || 'その他',
             status: 'not-started',
             description: '',
             requirements: '',
@@ -163,7 +178,7 @@ const TaskManagementBoard = () => {
 
       console.log('Task added successfully:', data);
       await loadProjects();
-      setNewTask({ title: '', priority: 'medium', dueDate: '' });
+      setNewTask({ title: '', priority: 'medium', dueDate: '', category: 'その他' });
       setIsAddingTask(false);
     } catch (error) {
       console.error('Error adding task:', error);
@@ -724,14 +739,24 @@ const TaskManagementBoard = () => {
                     </button>
                   ) : (
                     <div className="mb-4 p-4 bg-gray-50 rounded border border-gray-300">
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
                         <input
                           type="text"
                           value={newTask.title}
                           onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                          className="md:col-span-2 px-3 py-2 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                          className="lg:col-span-2 px-3 py-2 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                           placeholder="タスク名"
                         />
+                        <select
+                          value={newTask.category}
+                          onChange={(e) => setNewTask({ ...newTask, category: e.target.value })}
+                          className="px-3 py-2 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                        >
+                          <option value="開発">開発</option>
+                          <option value="営業">営業</option>
+                          <option value="マーケティング">マーケティング</option>
+                          <option value="その他">その他</option>
+                        </select>
                         <select
                           value={newTask.priority}
                           onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
@@ -759,7 +784,7 @@ const TaskManagementBoard = () => {
                         <button
                           onClick={() => {
                             setIsAddingTask(false);
-                            setNewTask({ title: '', priority: 'medium', dueDate: '' });
+                            setNewTask({ title: '', priority: 'medium', dueDate: '', category: 'その他' });
                           }}
                           className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 flex items-center gap-2"
                         >
@@ -798,7 +823,7 @@ const TaskManagementBoard = () => {
                                 {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                               </button>
 
-                              <div className="flex-1">
+                              <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1 flex-wrap">
                                   <input
                                     type="text"
@@ -806,13 +831,15 @@ const TaskManagementBoard = () => {
                                     onChange={(e) => updateTaskDetails(selectedProject.id, task.id, 'title', e.target.value)}
                                     onClick={(e) => e.stopPropagation()}
                                     onBlur={() => {}} 
-                                    className="font-semibold text-gray-800 bg-transparent border-0 focus:outline-none focus:ring-0 px-0 py-0"
-                                    style={{ width: `${Math.max(task.title.length * 8, 100)}px` }}
+                                    className="font-semibold text-gray-800 bg-transparent border-0 focus:outline-none focus:ring-0 px-0 py-0 flex-1 min-w-[100px] max-w-full"
                                   />
-                                  <span className={`px-2 py-0.5 rounded text-xs ${priorityColors[task.priority]}`}>
+                                  <span className={`px-2 py-0.5 rounded text-xs whitespace-nowrap ${categoryColors[task.category || 'その他']}`}>
+                                    {categoryLabels[task.category || 'その他']}
+                                  </span>
+                                  <span className={`px-2 py-0.5 rounded text-xs whitespace-nowrap ${priorityColors[task.priority]}`}>
                                     {priorityLabels[task.priority]}
                                   </span>
-                                  <span className={`px-2 py-0.5 rounded text-xs ${statusColors[task.status]}`}>
+                                  <span className={`px-2 py-0.5 rounded text-xs whitespace-nowrap ${statusColors[task.status]}`}>
                                     {statusLabels[task.status]}
                                   </span>
                                 </div>
@@ -864,8 +891,8 @@ const TaskManagementBoard = () => {
                             {/* 展開された詳細セクション */}
                             {isExpanded && (
                               <div className="bg-gray-50 border-t border-gray-300 p-4 space-y-4">
-                                {/* 担当者・優先度・期限日 */}
-                                <div className="grid grid-cols-3 gap-4">
+                                {/* 担当者・カテゴリー・優先度・期限日 */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                   <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                       担当者（任意）
@@ -877,6 +904,21 @@ const TaskManagementBoard = () => {
                                       className="w-full px-3 py-2 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                                       placeholder="担当者名..."
                                     />
+                                  </div>
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                      カテゴリー
+                                    </label>
+                                    <select
+                                      value={task.category || 'その他'}
+                                      onChange={(e) => updateTaskDetails(selectedProject.id, task.id, 'category', e.target.value, true)}
+                                      className="w-full px-3 py-2 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                                    >
+                                      <option value="開発">開発</option>
+                                      <option value="営業">営業</option>
+                                      <option value="マーケティング">マーケティング</option>
+                                      <option value="その他">その他</option>
+                                    </select>
                                   </div>
                                   <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
