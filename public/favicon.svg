@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- 背景 -->
+  <rect x="44" y="33" width="936" height="958" rx="80" ry="80" fill="none" stroke="#1e6bb8" stroke-width="40"/>
+  <rect x="84" y="73" width="856" height="878" rx="60" ry="60" fill="#ffffff"/>
+  
+  <!-- チェックリスト項目1（チェック済み） -->
+  <rect x="267" y="298" width="105" height="105" rx="8" fill="#1e6bb8"/>
+  <path d="M 285 350 L 310 375 L 355 320" stroke="#ffffff" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="426" y="298" width="295" height="105" rx="8" fill="#1e6bb8"/>
+  
+  <!-- チェックリスト項目2 -->
+  <rect x="267" y="460" width="105" height="105" rx="8" fill="#1e6bb8"/>
+  <rect x="426" y="460" width="295" height="105" rx="8" fill="#1e6bb8"/>
+  
+  <!-- チェックリスト項目3 -->
+  <rect x="267" y="620" width="105" height="105" rx="8" fill="#1e6bb8"/>
+  <rect x="426" y="620" width="363" height="105" rx="8" fill="#1e6bb8"/>
+</svg>
