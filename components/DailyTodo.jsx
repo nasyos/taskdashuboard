@@ -3,6 +3,7 @@ import { Plus, Check, X, Trash2, Calendar, ChevronLeft, ChevronRight } from 'luc
 import { supabase } from '../lib/supabaseClient';
 
 const DailyTodo = () => {
+  const [mounted, setMounted] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [todos, setTodos] = useState([]);
   const [newTodoTitle, setNewTodoTitle] = useState('');
@@ -11,8 +12,14 @@ const DailyTodo = () => {
   const [tableError, setTableError] = useState(false);
 
   useEffect(() => {
-    loadTodos();
-  }, [selectedDate]);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      loadTodos();
+    }
+  }, [selectedDate, mounted]);
 
   const formatDate = (date) => {
     const year = date.getFullYear();
@@ -169,6 +176,8 @@ const DailyTodo = () => {
 
   const completedCount = todos.filter(todo => todo.completed).length;
   const totalCount = todos.length;
+
+  if (!mounted) return null;
 
   return (
     <div className="bg-white rounded border border-gray-300 p-6 shadow-sm">

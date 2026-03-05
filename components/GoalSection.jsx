@@ -49,6 +49,7 @@ const COLOR_MAP = {
 };
 
 const GoalSection = () => {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [goals, setGoals] = useState({});
   const [addingCategory, setAddingCategory] = useState(null);
@@ -61,10 +62,14 @@ const GoalSection = () => {
   const editInputRef = useRef(null);
 
   useEffect(() => {
-    if (isOpen) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && isOpen) {
       loadGoals();
     }
-  }, [isOpen]);
+  }, [isOpen, mounted]);
 
   useEffect(() => {
     if (addingCategory && inputRef.current) {
@@ -175,6 +180,8 @@ const GoalSection = () => {
   };
 
   const totalGoals = Object.values(goals).reduce((sum, arr) => sum + arr.length, 0);
+
+  if (!mounted) return null;
 
   return (
     <div className="bg-white rounded border border-gray-300 shadow-sm">
